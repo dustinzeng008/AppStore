@@ -11,7 +11,8 @@ import UIKit
 private let reuseIdentifier = "Cell"
 
 class ReviewsController: HorizontalSnappingController, UICollectionViewDelegateFlowLayout {
-    var app:Result? {
+    
+    var reviews: Reviews? {
         didSet {
             collectionView.reloadData()
         }
@@ -27,15 +28,27 @@ class ReviewsController: HorizontalSnappingController, UICollectionViewDelegateF
 
 
     // MARK: UICollectionViewDataSource
-
-
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return 4
     }
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as! ReviewCell
-    
+        
+        let entry = self.reviews?.feed.entry[indexPath.item]
+        cell.titleLabel.text = entry?.title.label
+        cell.authorLabel.text = entry?.author.name.label
+        cell.bodyLabel.text = entry?.content.label
+        
+        if (entry != nil) {
+            for (index, view) in cell.starsStackView.arrangedSubviews.enumerated() {
+                if let ratingInt = Int(entry!.rating.label) {
+                    view.alpha = index >= ratingInt ? 0 : 1
+                }
+            }
+        }
+        
+        
         return cell
     }
     
